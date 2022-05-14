@@ -6,6 +6,9 @@ public class Tablero
 {
     private int[] casilla = new int[5];
     private int casillaVacia = 2;
+
+    private int totalminmax = 0;
+    private int posiblesganadosCOM = 0;
     /*
      *   1 ----- 2
      *   | \   / |
@@ -33,10 +36,23 @@ public class Tablero
 	{
 	    //Mostrar tablero
 	    verTablero();
-	    //turno del jugador actual
-	    turno(turnoJugador);
+
+	    //Turno de com
+	    if(turnoJugador == -1)
+	    {
+		turnoCOM_MM();
+	    }
+
+	    //turno del humano
+	    else
+	    {
+		turno(turnoJugador);
+	    }
+	    
 	    //cambio de turno
 	    turnoJugador *= -1;
+
+	    
 	    //Determinar si aun hay jugadas posibles
 	    if(!comprobarTablero(turnoJugador))
 	    {
@@ -87,14 +103,168 @@ public class Tablero
 	casillaVacia = casillaInicial;
     }
 
-    private void turnoCOM()
+    /**Turno del COM usando minimax*/
+    public void turnoCOM_MM()
     {
 	//Com tiene dos fichas, por lo que en cada turno tiene dos posibilidades de jugadas.
 	//1- Determinar las casillas de las fichas
-	//2- minmax de cada casilla
-	//minmax determinado por numero de jugadas posibles del jugador - numero de jugadas posibles
-	//del contricante. 
-	//3- jugar la casilla mas favorable
+	//Los "hijo" de la posicion actual
+
+	totalminmax = 0;
+	posiblesganadosCOM = 0;
+	
+	int[] fichas = new int[2];
+	int indice = 0;
+	for(int i = 0; i < 5; i++)
+	{
+	    if(casilla[i]==-1)
+	    {
+		fichas[indice] = i;
+		indice++;
+	    }
+	}
+
+	
+	//Primer paso recursivo de miniMax
+	int maxEval = Integer.MIN_VALUE;
+	int jugada = 0;
+
+	//Para recordar la posicion vacia de la configuracion actual
+	int vaciaTemp = casillaVacia;
+	
+	//Para cada hijo de la iteracion actual
+	for(int i = 0; i < 2; i++)
+	{
+	    //Si se puede realizar una jugada
+	    if(comprobarCasilla(fichas[i]))
+	    {
+		//mover ficha al espacio vacio
+		casilla[fichas[i]]=0;
+		casilla[vaciaTemp]=-1;
+		casillaVacia = fichas[i];
+		
+		//Evaluar minmax
+		int eval = minimax(10, 1);
+		jugada = (eval>maxEval)? i : jugada;
+		maxEval = (eval>maxEval)?eval:maxEval;
+		
+		//Backtrack
+		casilla[fichas[i]]=-1;
+		casilla[vaciaTemp]=0;
+		casillaVacia = vaciaTemp;
+		
+	    }
+	}
+
+	//flavor text
+	System.out.println("COM miró hacia adelante en el tiempo y vio " + totalminmax + " futuros posibles");
+	System.out.println("COM gana en " + posiblesganadosCOM + " de ellos.");
+	System.out.println("La mejor jugada para COM es mover la ficha en la casilla " + (fichas[jugada]+1));
+
+	swapCasillaVacia(fichas[jugada]);
+	System.out.println("\nCOM ha movido la ficha en la casilla " + (fichas[jugada]+1));
+	Utilidad.waitInput();
+    }
+
+    /**Funcion miniMax del juego, especifico para COM
+     *@param profundidad - profundidad de la iteracion actual
+     *@pparam jugadorMax - jugador de la iteracion actual cuyos movimientos se val a evaluar
+     *@return integer con la evaluacion de movimientos
+     */
+    private int minimax(int profundidad, int jugadorMax)
+    {
+	//Si se llega al final del arbol por produnfidad, o si por la configuracion del tablero
+	//se termina el juego
+	if((profundidad == 0)||!comprobarTablero(1)||!comprobarTablero(-1))
+	{
+	    totalminmax++;
+	    
+	    //System.out.println(jugadasPosibles(jugadorMax) + " "  +jugadasPosibles(jugadorMax*-1));
+
+	    //verTablero();
+	    //System.out.println("Minmax = " + (jugadasPosibles(jugadorMax)-jugadasPosibles(jugadorMax*-1)));
+	    //Utilidad.waitInput();
+
+	    if(jugadasPosibles(1)==0)
+	    {
+		posiblesganadosCOM++;
+	    }
+	    
+	    return jugadasPosibles(-1)-jugadasPosibles(1);
+	}
+
+	//Movimientos posibles a partir de la posicion actual
+	//Los "hijo" del nodo actual de minimax
+	int[] fichas = new int[2];
+	int indice = 0;
+	for(int i = 0; i < 5; i++)
+	{
+	    if(casilla[i]==jugadorMax)
+	    {
+		fichas[indice] = i;
+		indice++;
+	    }
+	}
+
+	//Para recordar la posicion vacia de la configuracion actual
+	int vaciaTemp = casillaVacia;
+
+	//Si se esta evaluando una posible jugada del com
+	if(jugadorMax == -1)
+	{
+	    int maxEval = Integer.MIN_VALUE;
+	    //Para cada hijo de la iteracion actual
+	    for(int i = 0; i < 2; i++)
+	    {
+		//Si se puede realizar una jugada
+		if(comprobarCasilla(fichas[i]))
+		{
+		    //mover ficha al espacio vacio
+		    casilla[fichas[i]]=0;
+		    casilla[vaciaTemp]=-1;
+		    casillaVacia = fichas[i];
+
+		    //Evaluar minmax
+		    int eval = minimax(profundidad-1, 1);
+		    maxEval = (eval>maxEval)?eval:maxEval;
+
+		    //Backtrack
+		    casilla[fichas[i]]=-1;
+		    casilla[vaciaTemp]=0;
+		    casillaVacia = vaciaTemp;
+		    
+		}
+	    }
+	    return maxEval;
+	}
+	//Si es una jugada del humano
+	else
+	{
+	    int minEval = Integer.MAX_VALUE;
+	    //Por cada hijo de la iteracion actual
+	    for(int i = 0; i < 2; i++)
+	    {
+		//si se puede realizar una jugada
+		if(comprobarCasilla(fichas[i]))
+		{
+		    //mover ficha al espacio vacio
+		    casilla[fichas[i]]=0;
+		    casilla[vaciaTemp]=1;
+		    casillaVacia = fichas[i];
+
+		    //Evaluar minimax
+		    int eval = minimax(profundidad-1, -1);
+		    minEval = (eval < minEval)?eval:minEval;
+
+		    //Backtrack
+		    casilla[fichas[i]]=1;
+		    casilla[vaciaTemp]=0;
+		    casillaVacia = vaciaTemp;
+		}
+	    }
+	    return minEval;
+	}
+	
     }
 
     /**Revisa si aun hay jugadas posibles en el tablero (si un jugador está atrapado)
@@ -207,5 +377,15 @@ public class Tablero
 	int resultado = Utilidad.randomRange(0,1);
 	if(resultado == 1){return -1;}
 	else return 1;
+    }
+
+    /**Cambia la casilla con la vacia
+     *@param n - numero de la casilla a mover
+     */
+    private void swapCasillaVacia(int n)
+    {
+	casilla[casillaVacia] = casilla[n];
+	casilla[n] = 0;
+	casillaVacia = n;
     }
 }
