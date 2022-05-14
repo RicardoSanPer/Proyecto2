@@ -5,6 +5,7 @@ import edd.src.Estructuras.Utilidad;
 public class Tablero
 {
     private int[] casilla = new int[5];
+    private int casillaVacia = 2;
     /*
      *   1 ----- 2
      *   | \   / |
@@ -27,12 +28,16 @@ public class Tablero
 
     public void jugar()
     {
-	int turnoJugador = 1;
-	for(int i = 0; i < 5; i++)
+	int turnoJugador = tirarMoneda();
+	while(true)
 	{
+	    //Mostrar tablero
 	    verTablero();
+	    //turno del jugador actual
 	    turno(turnoJugador);
+	    //cambio de turno
 	    turnoJugador *= -1;
+	    //Determinar si aun hay jugadas posibles
 	    if(!comprobarTablero(turnoJugador))
 	    {
 		System.out.println("El jugador " + turnoJugador + " ha perdido");
@@ -46,18 +51,23 @@ public class Tablero
      */
     public void turno(int jugador)
     {
+	System.out.printf("Turno de ");
+	if(jugador==-1){System.out.println("COM");}
+	else{System.out.println("Humano");}
 	//Casilla origen
 	System.out.println("Ingresa la casilla de la ficha que quieres mover:");
 	int casillaInicial = Utilidad.getRange(1,5)-1;
-	while(casilla[casillaInicial]!=jugador)
+	//Comprueba si la ficha en la casilla pertenece al jugador y se puede mover (no esta encerrada)
+	while(!comprobarCasilla(casillaInicial) || casilla[casillaInicial]!=jugador)
 	{
-	    System.out.println("No tienes una ficha en esa casilla. Intenta con otra");
+	    System.out.println("No puedes mover la ficha en esta posicion. Intenta con otra");
 	    casillaInicial = Utilidad.getRange(1,5)-1;
 	}
 	//casilla destino
 	System.out.println("Ingresa la casilla a la que quieres mover la ficha");
 	int casillaDestino = Utilidad.getRange(1,5)-1;
-	while(casilla[casillaDestino]!=0)
+	//Comprueba que la casilla destino sea la casilla vacia.
+	while(casillaDestino!=casillaVacia)
 	{
 	    System.out.println("Esta casilla no esta vacia. Intenta con otra.");
 	    casillaDestino = Utilidad.getRange(1,5)-1;
@@ -65,6 +75,12 @@ public class Tablero
 	//Movimiento de la ficha
 	casilla[casillaDestino]=jugador;
 	casilla[casillaInicial]=0;
+	//Actualiza la casilla vacia actual
+	casillaVacia = casillaInicial;
+    }
+
+    private void turnoCOM()
+    {
     }
 
     /**Revisa si aun hay jugadas posibles en el tablero (si un jugador está atrapado)
@@ -98,9 +114,25 @@ public class Tablero
 	{
 	    resultado = (casilla[1]==0 || casilla[2]==0||resultado);
 	}
-
-	System.out.println(resultado);
 	return resultado;
+    }
+    
+    /**Determina si una casilla tiene jugadas posibles (es adyacente a la casilla vacia)
+     *@param casillaComprobar - numero de la casilla a comprobar
+     *@return boolean indicando si tiene jugadas o no.
+     */
+    public boolean comprobarCasilla(int casillaComprobar)
+    {
+	switch(casillaComprobar)
+	{
+	case 0: return (casilla[1]==0 || casilla[2]==0 || casilla[3]==0);
+	case 1: return (casilla[0]==0 || casilla[2]==0 || casilla[4]==0);
+	case 2: return (casilla[0]==0 || casilla[1]==0 || casilla[3]==0 || casilla[4]==0);
+	case 3: return (casilla[0]==0 || casilla[2]==0);
+	case 4: return (casilla[1]==0 || casilla[2]==0);
+	default: break;
+	}
+	return false;
     }
 
     /**Imprime el tablero*/
@@ -134,5 +166,15 @@ public class Tablero
 	System.out.println("\n");
 	System.out.println("  🔴: Jugador");
 	System.out.println("  🔷: COM");
+    }
+
+    /**Funcion para determinar cual jugador comienza el juego
+     *@return integer con el jugador a iniciar (-1: jugador 2, 1: jugador 1);
+     */
+    private int tirarMoneda()
+    {
+	int resultado = Utilidad.randomRange(0,1);
+	if(resultado == 1){return -1;}
+	else return 1;
     }
 }
