@@ -33,6 +33,11 @@ public class Tablero
 	    verTablero();
 	    turno(turnoJugador);
 	    turnoJugador *= -1;
+	    if(!comprobarTablero(turnoJugador))
+	    {
+		System.out.println("El jugador " + turnoJugador + " ha perdido");
+		return;
+	    }
 	}
     }
 
@@ -60,14 +65,42 @@ public class Tablero
 	//Movimiento de la ficha
 	casilla[casillaDestino]=jugador;
 	casilla[casillaInicial]=0;
-	
     }
 
     /**Revisa si aun hay jugadas posibles en el tablero (si un jugador está atrapado)
      */
-    public boolean comprobarTablero()
+    public boolean comprobarTablero(int jugador)
     {
-	return false;
+	boolean resultado = false;
+	
+	//Casilla 1
+	if(casilla[0]==jugador)
+	{
+	    resultado = (casilla[1]==0 || casilla[3]==0||resultado);
+	}
+	//Casilla 2
+	if(casilla[1]==jugador)
+	{
+	    resultado = (casilla[0]==0 || casilla[2]==0||casilla[4]==0||resultado);
+	}
+	//Casilla 3
+	if(casilla[2]==jugador)
+	{
+	    resultado = (casilla[0]==0 || casilla[1]==0||casilla[3]==0||casilla[4]==0||resultado);
+	}
+	//casilla 4
+	if(casilla[3]==jugador)
+	{
+	    resultado = (casilla[0]==0 || casilla[2]==0||resultado);
+	}
+	//casilla 5
+	if(casilla[4]==jugador)
+	{
+	    resultado = (casilla[1]==0 || casilla[2]==0||resultado);
+	}
+
+	System.out.println(resultado);
+	return resultado;
     }
 
     /**Imprime el tablero*/

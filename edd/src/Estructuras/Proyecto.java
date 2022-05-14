@@ -9,5 +9,7 @@ public class Proyecto
     {
 	System.out.println("Proyecto");
         tablero.jugar();
+	tablero.verTablero();
+	//tablero.comprobarTablero(1);
     }
 }
