@@ -54,33 +54,47 @@ public class Tablero
 	System.out.printf("Turno de ");
 	if(jugador==-1){System.out.println("COM");}
 	else{System.out.println("Humano");}
+
+	System.out.println("El jugador tiene " + jugadasPosibles(jugador) + " jugadas posibles");
+	
 	//Casilla origen
 	System.out.println("Ingresa la casilla de la ficha que quieres mover:");
 	int casillaInicial = Utilidad.getRange(1,5)-1;
+
 	//Comprueba si la ficha en la casilla pertenece al jugador y se puede mover (no esta encerrada)
 	while(!comprobarCasilla(casillaInicial) || casilla[casillaInicial]!=jugador)
 	{
 	    System.out.println("No puedes mover la ficha en esta posicion. Intenta con otra");
 	    casillaInicial = Utilidad.getRange(1,5)-1;
 	}
+
 	//casilla destino
 	System.out.println("Ingresa la casilla a la que quieres mover la ficha");
 	int casillaDestino = Utilidad.getRange(1,5)-1;
+
 	//Comprueba que la casilla destino sea la casilla vacia.
 	while(casillaDestino!=casillaVacia)
 	{
 	    System.out.println("Esta casilla no esta vacia. Intenta con otra.");
 	    casillaDestino = Utilidad.getRange(1,5)-1;
 	}
+
 	//Movimiento de la ficha
 	casilla[casillaDestino]=jugador;
 	casilla[casillaInicial]=0;
+
 	//Actualiza la casilla vacia actual
 	casillaVacia = casillaInicial;
     }
 
     private void turnoCOM()
     {
+	//Com tiene dos fichas, por lo que en cada turno tiene dos posibilidades de jugadas.
+	//1- Determinar las casillas de las fichas
+	//2- minmax de cada casilla
+	//minmax determinado por numero de jugadas posibles del jugador - numero de jugadas posibles
+	//del contricante. 
+	//3- jugar la casilla mas favorable
     }
 
     /**Revisa si aun hay jugadas posibles en el tablero (si un jugador está atrapado)
@@ -166,6 +180,23 @@ public class Tablero
 	System.out.println("\n");
 	System.out.println("  🔴: Jugador");
 	System.out.println("  🔷: COM");
+    }
+
+    /**Obtiene el numero de jugadas/Fichas que el jugador puede mover.
+     *@param jugador - Jugador a buscar numero de jugadas
+     *@return numero de jugadas posibles
+     */
+    private int jugadasPosibles(int jugador)
+    {
+	int contador = 0;
+	for(int i = 0; i < 5; i++)
+	{
+	    if(casilla[i]==jugador && comprobarCasilla(i))
+	    {
+		contador++;
+	    }
+	}
+	return contador;
     }
 
     /**Funcion para determinar cual jugador comienza el juego
