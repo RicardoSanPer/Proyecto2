@@ -8,8 +8,14 @@ public class Tablero extends ArbolBinario<Integer>
     private int[] casilla = new int[5];
     private int casillaVacia = 2;
 
+    private boolean comminmax = true;
+    private boolean jugadorCOM = true;
+    
     private int totalminmax = 0;
     private int posiblesganadosCOM = 0;
+
+    private String jugador1 = "Jugador 1";
+    private String jugador2 = "COM";
     /*
      *   1 ----- 2
      *   | \   / |
@@ -43,9 +49,11 @@ public class Tablero extends ArbolBinario<Integer>
 	    verTablero();
 
 	    //Turno de com
-	    if(turnoJugador == -1)
+	    if(turnoJugador == -1 && jugadorCOM)
 	    {
-		turnoCOM_MM();
+		promptCOM();
+		if(comminmax){turnoCOM_MM();}
+		else{turnoCOM_Azar();}
 	    }
 
 	    //turno del humano
@@ -61,8 +69,44 @@ public class Tablero extends ArbolBinario<Integer>
 	    //Determinar si aun hay jugadas posibles
 	    if(!comprobarTablero(turnoJugador))
 	    {
-		System.out.println("El jugador " + turnoJugador + " ha perdido");
+		verTablero();
+		if(turnoJugador == -1)
+		{
+		    System.out.println(jugador1 + " ha ganado");
+		}
+		else
+		{
+		    System.out.println(jugador2 + " ha ganado");
+		}
+		Utilidad.waitInput();
 		return;
+	    }
+	}
+    }
+
+    /**Pregunta si se desea cambiar el modo de juego de COM
+     */
+    public void promptCOM()
+    {
+	System.out.println("Deseas cambiar la configuración de " + jugador2);
+	if(isDumb())
+	{
+	    System.out.println("Actual: Azar");
+	}
+	else
+	{
+	    System.out.println("Actual: MiniMax");
+	}
+
+	if(Utilidad.getUserBool())
+	{
+	    if(isDumb())
+	    {
+		setMiniMax();
+	    }
+	    else
+	    {
+		setAzar();
 	    }
 	}
     }
@@ -73,8 +117,8 @@ public class Tablero extends ArbolBinario<Integer>
     public void turno(int jugador)
     {
 	System.out.printf("Turno de ");
-	if(jugador==-1){System.out.println("COM");}
-	else{System.out.println("Humano");}
+	if(jugador==-1){System.out.println(jugador2);}
+	else{System.out.println(jugador1);}
 
 	//System.out.println("El jugador tiene " + jugadasPosibles(jugador) + " jugadas posibles");
 	
@@ -97,6 +141,42 @@ public class Tablero extends ArbolBinario<Integer>
 	casillaVacia = casillaInicial;
     }
 
+    /**Mueve fichas de COM al azar. En raras ocaciones mueve fichas que se su pone no deberia de mover
+     * No estoy deguro de por que
+     */
+    private void turnoCOM_Azar()
+    {
+	int[] fichas = new int[2];
+	int indice = 0;
+	for(int i = 0; i < 5; i++)
+	{
+	    if(casilla[i]==-1)
+	    {
+		fichas[indice] = i;
+		indice++;
+	    }
+	}
+
+	int jugada = Utilidad.randomRange(0,1);
+
+	//System.out.println("JUgadas: " + (fichas[0]+1) + " " + (fichas[1]+1));
+	//System.out.println((fichas[jugada]+1));
+
+	//Si la jugade no es posible
+	if(!comprobarCasilla(jugada))
+	{
+	    jugada = Utilidad.wrapInteger((jugada+1),0,1);
+	}
+
+	
+	
+	//flavor text
+	System.out.println("\n" + jugador2 + " tiene jalea en el CPU y no sabe lo que hace.");
+	System.out.println(jugador2 + " juega la ficha en la casilla " + (fichas[jugada]+1));
+	swapCasillaVacia(fichas[jugada]);
+	Utilidad.waitInput();
+    }
+    
     /**Turno del COM usando minimax*/
     public void turnoCOM_MM()
     {
@@ -112,12 +192,12 @@ public class Tablero extends ArbolBinario<Integer>
 	//System.out.println((raiz.izquierdo.elemento+1) + " " + (raiz.derecho.elemento+1));
 
 	//System.out.println("minimax arbol");
-	System.out.printf("\nCOM miró 10 turnos hacia adelante en el tiempo y vio %d futuros posibles, ", totalminmax);
+	System.out.printf("\n" + jugador2 + " miró 10 turnos hacia adelante en el tiempo y vio %d futuros posibles, ", totalminmax);
 	System.out.println("ganando en " + posiblesganadosCOM + " de ellos.");
 	//System.out.println("La mejor jugada para COM es mover la ficha en la casilla " + (raiz.elemento+1));
 
 	swapCasillaVacia(raiz.elemento);
-	System.out.println("\nCOM ha movido la ficha en la casilla " + (raiz.elemento+1));
+	System.out.println("\n" + jugador2 + " ha movido la ficha en la casilla " + (raiz.elemento+1));
 	Utilidad.waitInput();
     }
 
@@ -125,7 +205,7 @@ public class Tablero extends ArbolBinario<Integer>
      *
      * Minimax funciona igual a cualquier implementacion, pero en adicion hay un arbol binario
      * donde cada nodo representa la jugada optima del jugador para la configuracion del tablero que se esta
-     * evaluando, siendo la raíz la jugada optima para el jugaqor que llamo la funcion (com) y por lo tanto
+     * evaluando, siendo la raíz la jugada optima para el jugador que llamo la funcion (com) y por lo tanto
      * la jugada que se realizará.
      *
      *
@@ -360,8 +440,8 @@ public class Tablero extends ArbolBinario<Integer>
 	System.out.printf("   |  /    \\  |\n");
 	System.out.printf("4:%s         5:%s", ficha[3], ficha[4]);
 	System.out.println("\n");
-	System.out.println("  🔴: Jugador");
-	System.out.println("  🔷: COM");
+	System.out.println("  🔴: " + jugador1);
+	System.out.println("  🔷: " + jugador2);
     }
 
     /**Obtiene el numero de jugadas/Fichas que el jugador puede mover.
@@ -404,5 +484,93 @@ public class Tablero extends ArbolBinario<Integer>
     @Override
     public Iterator<Integer> iterator() {
         return null;
+    }
+
+    /**Establece el modo de juego de COM a usar minimax*/
+    public void setMiniMax()
+    {
+	comminmax = true;
+    }
+
+    /**Establece el modo de juego de COM a usar movimientos al azar*/
+    public void setAzar()
+    {
+	comminmax = false;
+    }
+
+    /**Reinicia el tablero para una nueva partida*/
+    public void reiniciarTablero()
+    {
+	casilla[0] = 1;
+	casilla[1] = -1;
+	casilla[2] = 0;
+	casilla[3] = -1;
+	casilla[4] = 1;
+
+	casillaVacia = 2;
+
+	totalminmax = 0;
+	posiblesganadosCOM = 0;
+    }
+
+    /**Cambia el nombre de un jugador
+     *@param n - numero del jugador a cambiar
+     *@param s - nombre del jugador
+     */
+    public void cambiarNombre(int n, String s)
+    {
+	if(n<1||n>2){return;}
+	
+	else if(n == 1)
+	{
+	    jugador1 = s;
+	}
+	else
+	{
+	    jugador2 = s;
+	}
+    }
+
+    /**Determina si el juego es contra la computadora o un humano
+     *@param boolean indicando si el oponente es humano
+     */
+    public boolean isCOM()
+    {
+	return jugadorCOM;
+    }
+
+    /**Determina si el COM esta configurado para jugar usando MiniMax o movimientos aleatorios
+     *@return boolean indicando si esta usando azar
+     */
+    public boolean isDumb()
+    {
+	return !comminmax;
+    }
+
+    /**Cambia el oponente a un humano*/
+    public void setHumano()
+    {
+	jugadorCOM = false;
+    }
+
+    /**Cambia el oponente a la computadora*/
+    public void setCOM()
+    {
+	jugadorCOM = true;
+    }
+
+    /**Obtiene el nombre del jugador 1
+     *@return string con el nombre del jugador
+     */
+    public String getJugador1()
+    {
+	return jugador1;
+    }
+    /**Obtiene el nombre del jugador 2
+     *@return string con el nombre del jugador
+     */
+    public String getJugador2()
+    {
+	return jugador2;
     }
 }
