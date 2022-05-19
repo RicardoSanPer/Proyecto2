@@ -1,0 +1,10 @@
+========== Encerrado: ==========
+
+El propósito del juego es encerrar al otro jugador.
+
+En cada turno los jugadores deben mover una ficha. La ficha solo se puede mover a
+una casilla vacia adyacente.
+
+Si un jugador no puede mover sus fichas, entonces queda encerrado y pierde el juego.
+
+
