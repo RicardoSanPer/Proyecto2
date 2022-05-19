@@ -8,7 +8,7 @@ public class Tablero extends ArbolBinario<Integer>
     private int[] casilla = new int[5];
     private int casillaVacia = 2;
 
-    private boolean comminmax = true;
+    private boolean comminmax = false;
     private boolean jugadorCOM = true;
     
     private int totalminmax = 0;
@@ -146,34 +146,18 @@ public class Tablero extends ArbolBinario<Integer>
      */
     private void turnoCOM_Azar()
     {
-	int[] fichas = new int[2];
-	int indice = 0;
-	for(int i = 0; i < 5; i++)
+	int jugada = Utilidad.randomRange(0,4);
+	System.out.println("COM esta jugando");
+	while(!(casilla[jugada]==-1 && comprobarCasilla(jugada)))
 	{
-	    if(casilla[i]==-1)
-	    {
-		fichas[indice] = i;
-		indice++;
-	    }
+	    jugada = Utilidad.randomRange(0,4);
+	    //jugada = Utilidad.wrapInteger((jugada+1),-1,4);
 	}
 
-	int jugada = Utilidad.randomRange(0,1);
-
-	//System.out.println("JUgadas: " + (fichas[0]+1) + " " + (fichas[1]+1));
-	//System.out.println((fichas[jugada]+1));
-
-	//Si la jugade no es posible
-	if(!comprobarCasilla(jugada))
-	{
-	    jugada = Utilidad.wrapInteger((jugada+1),0,1);
-	}
-
-	
-	
 	//flavor text
 	System.out.println("\n" + jugador2 + " tiene jalea en el CPU y no sabe lo que hace.");
-	System.out.println(jugador2 + " juega la ficha en la casilla " + (fichas[jugada]+1));
-	swapCasillaVacia(fichas[jugada]);
+	System.out.println(jugador2 + " juega la ficha en la casilla " + (jugada+1));
+	swapCasillaVacia(jugada);
 	Utilidad.waitInput();
     }
     
@@ -221,6 +205,7 @@ public class Tablero extends ArbolBinario<Integer>
 	if((profundidad == 0)||!comprobarTablero(1)||!comprobarTablero(-1))
 	{
 	    totalminmax++;
+	    //Aumenta el numero de casos en los que gana com
 	    if(jugadasPosibles(1)==0)
 	    {
 		posiblesganadosCOM++;
@@ -360,42 +345,28 @@ public class Tablero extends ArbolBinario<Integer>
     }
 
     /**Revisa si aun hay jugadas posibles en el tablero (si un jugador está atrapado)
+     *@param jugador - Jugador a comprobar si esta encerrado
+     *@return boolean: true si aun puede jugar, false si esta encerrado
      */
     public boolean comprobarTablero(int jugador)
     {
-	boolean resultado = false;
-	
-	//Casilla 1
-	if(casilla[0]==jugador)
+	//Como un jugador es 1 y el otro -1, se puede obtener al contricante
+	//multiplicando por -1
+	int oponente = jugador*-1;
+	if(casilla[0]==jugador && casilla[3]==jugador && casilla[1]==oponente && casilla[2]==oponente)
 	{
-	    resultado = (casilla[1]==0 || casilla[3]==0||resultado);
+	    return false;
 	}
-	//Casilla 2
-	if(casilla[1]==jugador)
+	if(casilla[1]==jugador && casilla[4]==jugador && casilla[0]==oponente && casilla[2]==oponente)
 	{
-	    resultado = (casilla[0]==0 || casilla[2]==0||casilla[4]==0||resultado);
+	    return false;
 	}
-	//Casilla 3
-	if(casilla[2]==jugador)
-	{
-	    resultado = (casilla[0]==0 || casilla[1]==0||casilla[3]==0||casilla[4]==0||resultado);
-	}
-	//casilla 4
-	if(casilla[3]==jugador)
-	{
-	    resultado = (casilla[0]==0 || casilla[2]==0||resultado);
-	}
-	//casilla 5
-	if(casilla[4]==jugador)
-	{
-	    resultado = (casilla[1]==0 || casilla[2]==0||resultado);
-	}
-	return resultado;
+	return true;
     }
     
     /**Determina si una casilla tiene jugadas posibles (es adyacente a la casilla vacia)
      *@param casillaComprobar - numero de la casilla a comprobar
-     *@return boolean indicando si tiene jugadas o no.
+     *@return boolean indicando si tiene jugadas posibles (true) o no (false).
      */
     public boolean comprobarCasilla(int casillaComprobar)
     {
@@ -574,3 +545,22 @@ public class Tablero extends ArbolBinario<Integer>
 	return jugador2;
     }
 }
+
+
+/*
+public boolean comprobarTablero(int jugador)
+{
+    //Como un jugador es 1 y el otro -1, se puede obtener al contricante
+    //multiplicando por -1
+    int oponente = jugador*-1;
+    if(casilla[0]==jugador && casilla[3]==jugador && casilla[1]==oponente && casilla[2]==oponente)
+    {
+	return false;
+    }
+    if(casilla[1]==jugador && casilla[4]==jugador && casilla[0]==oponente && casilla[2]==oponente)
+    {
+	return false;
+    }
+    return true;
+}
+*/
