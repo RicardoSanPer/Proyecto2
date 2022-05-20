@@ -42,7 +42,10 @@ public class Tablero extends ArbolBinario<Integer>
      */
     public void jugar()
     {
+	//Elegir jugador inicial
 	int turnoJugador = elegirIniciador();
+	//Cambiar configuracion inicial del tablero
+	setFichas();
 	while(true)
 	{
 	    //Mostrar tablero
@@ -65,15 +68,6 @@ public class Tablero extends ArbolBinario<Integer>
 	    verTablero();
 	    //Utilidad.waitInput();
 	    
-
-	    //Preguntar si continuar con el juego
-	    System.out.println("¿Deseas abandonar el juego?");
-	    if(Utilidad.getUserBool())
-	    {
-		return;
-	    }
-
-	    
 	    //cambio de turno
 	    turnoJugador *= -1;
 
@@ -91,6 +85,13 @@ public class Tablero extends ArbolBinario<Integer>
 		    System.out.println(jugador2 + " ha ganado");
 		}
 		Utilidad.waitInput();
+		return;
+	    }
+
+	    //Preguntar si continuar con el juego
+	    System.out.println("¿Deseas abandonar el juego?");
+	    if(Utilidad.getUserBool())
+	    {
 		return;
 	    }
 	}
@@ -438,7 +439,7 @@ public class Tablero extends ArbolBinario<Integer>
 		ficha[i] = "[ ]";
 	    }
 	}
-
+	System.out.println("==============================");
 	System.out.printf("1:%s - - - - 2:%s\n", ficha[0], ficha[1]);
 	System.out.printf("   | \\     /  |\n");
 	System.out.printf("   | 3:%s     |\n", ficha[2]);
@@ -577,6 +578,84 @@ public class Tablero extends ArbolBinario<Integer>
     public String getJugador2()
     {
 	return jugador2;
+    }
+
+    /**Cambia la configuracion inicial del tablero
+     */
+    public void setFichas()
+    {
+	verTablero();
+	System.out.println("¿Deseas cambiar la configuración inicial del tablero?");
+	//Si el jugador no quiere cambiar el tablero, regresa
+	if(!Utilidad.getUserBool())
+	{
+	    return;
+	}
+	//reinicia el tablero
+	for(int i = 0; i < 5; i++)
+	{
+	    casilla[i]=0;
+	}
+	//Jugador 1 coloca la primera ficha
+	int casillaJugador = 1;
+	
+	//Colocar las cuatro fichas alternando entre ambos jugadores
+	for(int i = 0; i < 4; i++)
+	{
+	    verTablero();
+	    System.out.printf("Coloca la ficha para ");
+	    if(casillaJugador == 1)
+	    {
+		System.out.println(jugador1);
+	    }
+	    else
+	    {
+		System.out.println(jugador2);
+	    }
+	    //Elegir la casilla
+	    int casillaSeleccionada = Utilidad.getRange(1,5) - 1;
+	    //Si es una casilla ya elegida
+	    while(casilla[casillaSeleccionada]!=0)
+	    {
+		System.out.println("Esta casilla ya está ocupada. Intenta con otra");
+		casillaSeleccionada = Utilidad.getRange(1,5) - 1;
+	    }
+	    //Colocar la ficha
+	    casilla[casillaSeleccionada] = casillaJugador;
+
+	    //Revisa si el tablero esta en una configuracion en la que uno de los jugadores gana inmediatamente
+	    //al iniciar el juego
+	    while(!comprobarTablero(-1)||!comprobarTablero(1))
+	    {
+		System.out.println("Esta configuracion de tablero no se puede. Por favor elige otra casilla");
+		//Vacia la ultima casilla
+		casilla[casillaSeleccionada]=0;
+
+		//Vuelve a solicitar una casilla
+		casillaSeleccionada = Utilidad.getRange(1,5) - 1;
+		//Si es una casilla ya elegida
+		while(casilla[casillaSeleccionada]!=0)
+		{
+		    System.out.println("Esta casilla ya está ocupada. Intenta con otra");
+		    casillaSeleccionada = Utilidad.getRange(1,5) - 1;
+		}
+		
+		//Colocar la ficha
+		casilla[casillaSeleccionada] = casillaJugador;
+	    }
+	    
+	    //Cambiar el jugador a colocar casilla
+	    casillaJugador *= -1;
+	}
+
+	//Cambiar el valor de casillaVacia
+	for(int i = 0; i < 5; i++)
+	{
+	    if(casilla[i]==0)
+	    {
+		casillaVacia = i;
+	    }
+	}
     }
 }
 
