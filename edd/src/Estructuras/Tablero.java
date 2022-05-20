@@ -42,7 +42,7 @@ public class Tablero extends ArbolBinario<Integer>
      */
     public void jugar()
     {
-	int turnoJugador = tirarMoneda();
+	int turnoJugador = elegirIniciador();
 	while(true)
 	{
 	    //Mostrar tablero
@@ -63,7 +63,7 @@ public class Tablero extends ArbolBinario<Integer>
 	    }
 
 	    verTablero();
-	    Utilidad.waitInput();
+	    //Utilidad.waitInput();
 	    
 
 	    //Preguntar si continuar con el juego
@@ -94,6 +94,28 @@ public class Tablero extends ArbolBinario<Integer>
 		return;
 	    }
 	}
+    }
+    /**Pregunta quien deberia iniciar el juego
+     *@return numero del jugador a iniciar (1- jugador1, -1 -COM)
+     */
+    private int elegirIniciador()
+    {
+	System.out.println("Elige quien iniciará el juego");
+	System.out.println("1. Al azar");
+	System.out.println("2. " + jugador1);
+	System.out.println("3. " + jugador2);
+
+	switch(Utilidad.getRange(1,3))
+	{
+	    //Al azar
+	    case 1: return tirarMoneda();
+		//Jugador 1
+	    case 2: return 1;
+		//jugador 2
+	    case 3: return -1;
+	    default: break;
+	}
+	return tirarMoneda();
     }
 
     /**Pregunta si se desea cambiar el modo de juego de COM
