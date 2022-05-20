@@ -55,12 +55,24 @@ public class Tablero extends ArbolBinario<Integer>
 		if(comminmax){turnoCOM_MM();}
 		else{turnoCOM_Azar();}
 	    }
-
+	    
 	    //turno del humano
 	    else
 	    {
 		turno(turnoJugador);
 	    }
+
+	    verTablero();
+	    Utilidad.waitInput();
+	    
+
+	    //Preguntar si continuar con el juego
+	    System.out.println("¿Deseas abandonar el juego?");
+	    if(Utilidad.getUserBool())
+	    {
+		return;
+	    }
+
 	    
 	    //cambio de turno
 	    turnoJugador *= -1;
@@ -88,7 +100,7 @@ public class Tablero extends ArbolBinario<Integer>
      */
     public void promptCOM()
     {
-	System.out.println("Deseas cambiar la configuración de " + jugador2);
+	System.out.println("¿Deseas cambiar la configuración de " + jugador2 + "?");
 	if(isDumb())
 	{
 	    System.out.println("Actual: Azar");
@@ -147,7 +159,7 @@ public class Tablero extends ArbolBinario<Integer>
     private void turnoCOM_Azar()
     {
 	int jugada = Utilidad.randomRange(0,4);
-	System.out.println("COM esta jugando");
+	//System.out.println("COM esta jugando");
 	while(!(casilla[jugada]==-1 && comprobarCasilla(jugada)))
 	{
 	    jugada = Utilidad.randomRange(0,4);
