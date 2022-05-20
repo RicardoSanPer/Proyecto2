@@ -72,15 +72,18 @@ public class Utilidad
      */
     public static boolean getUserBool()
     {
-	System.out.printf("[S/1: Si, N/0/ENTER: No]: ");
+	System.out.printf("[S/1: Si, N/0: No]: ");
 	String texto = getUserLine();
 	texto = texto.toUpperCase();
 	texto = texto.trim();
 
 	if(texto.matches("^(Y|S|1)")){return true;}
-	else{return false;}
-
+	if(texto.matches("^(N|0)")){return false;}
+	else{
+	    return false;
+	}
     }
+
     
 
     /**Genera un número entero aleatorio dentro de un rango

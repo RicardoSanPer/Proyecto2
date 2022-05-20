@@ -88,28 +88,53 @@ public class Tablero extends ArbolBinario<Integer>
      */
     public void promptCOM()
     {
-	System.out.println("Deseas cambiar la configuración de " + jugador2);
-	if(isDumb())
-	{
-	    System.out.println("Actual: Azar");
-	}
-	else
-	{
-	    System.out.println("Actual: MiniMax");
-	}
 
-	if(Utilidad.getUserBool())
-	{
-	    if(isDumb())
-	    {
-		setMiniMax();
-	    }
-	    else
-	    {
-		setAzar();
-	    }
-	}
+	//	do
+	//	{
+		System.out.println("\n Escoje lo que deseas realizar" +
+				   "\n1 Seguir jugando" +
+				   "\n2 Regresar al menú principal");
+		int opcion = Utilidad.getUserInt();
+
+		switch(opcion)
+		    {
+		    case 1:
+			
+			System.out.println("Deseas cambiar la configuración de " + jugador2);
+			
+			if(isDumb())
+			    {
+				System.out.println("Actual: Azar");
+			    }
+			else
+			    {
+				System.out.println("Actual: MiniMax");
+			    }
+			
+			if(Utilidad.getUserBool())
+			    {
+				if(isDumb())
+				    {
+					setMiniMax();
+				    }
+				else if(!isDumb())
+				    {
+					setAzar();
+				    }
+				//excepción si no es un número válido
+			    }
+			case 2:
+			    return;
+		    default:break;
+		    }
+		
+		//  }
+    //	while(opcion != 2);
+
+	
     }
+
+   
 
     /**Mueve la ficha de una casilla a otra.
      *@param jugador - numero del jugador cuyo turno es
