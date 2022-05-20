@@ -43,99 +43,147 @@ public class Tablero extends ArbolBinario<Integer>
     public void jugar()
     {
 	int turnoJugador = tirarMoneda();
-	while(true)
-	{
-	    //Mostrar tablero
-	    verTablero();
-
-	    //Turno de com
-	    if(turnoJugador == -1 && jugadorCOM)
+	System.out.println("\n¿Quién iniciará el juego?" +
+				"\n1 Inicia computadora." +
+				"\n2 Inicias tú (jugador)." +
+			       "\n3 Iniciador aleatorio." +
+			       "\n4 Salir");
+	
+	int getIniciador = Utilidad.getUserInt();
+	
+	//JUGADA COMPUTADORA INICIA
+	if(getIniciador == 1)
 	    {
+		verTablero();
+		
 		promptCOM();
 		if(comminmax){turnoCOM_MM();}
 		else{turnoCOM_Azar();}
-	    }
-
-	    //turno del humano
-	    else
-	    {
-		turno(turnoJugador);
-	    }
-	    
-	    //cambio de turno
-	    turnoJugador *= -1;
-
-	    
-	    //Determinar si aun hay jugadas posibles
-	    if(!comprobarTablero(turnoJugador))
+	    }		
+	//TERMINA COMPUTADORA INICIA
+	
+	//JUGADA JUGADOR INICIA
+	if(getIniciador == 2)
 	    {
 		verTablero();
-		if(turnoJugador == -1)
-		{
-		    System.out.println(jugador1 + " ha ganado");
-		}
-		else
-		{
-		    System.out.println(jugador2 + " ha ganado");
-		}
-		Utilidad.waitInput();
-		return;
+		
+		turno(turnoJugador);
 	    }
-	}
+	//TERMINA JUGADOR INICIA
+	
+	//JUGADA ALEATORIA   
+	//Turno de com
+	if(getIniciador == 3)
+	    {
+		verTablero();
+		
+		if(turnoJugador == -1 && jugadorCOM)
+		    {
+			promptCOM();
+			if(comminmax){turnoCOM_MM();}
+			else{turnoCOM_Azar();}
+		    }
+		
+		//turno del humano
+		else
+		    {
+			turno(turnoJugador);
+		    }
+	    }
+	//TERMINA JUGADA ALEATORIA
+	
+	//SALIR
+	if(getIniciador == 4){return;}
+	
+	while(true)
+	    {
+		verTablero();
+
+		//Turno de com
+		if(turnoJugador == -1 && jugadorCOM)
+		    {
+			promptCOM();
+			if(comminmax){turnoCOM_MM();}
+			else{turnoCOM_Azar();}
+		    }
+		
+		//turno del humano
+		else
+		    {
+			turno(turnoJugador);
+		    }
+		
+		
+		
+		verTablero();
+		Utilidad.waitInput();
+		
+		
+		//Preguntar su continuar con el juego
+		
+		System.out.println("¿Deseas abandonar el juego?");
+		if(Utilidad.getUserBool())
+		    return;
+		
+		//cambio de turno
+		turnoJugador *= -1;
+		
+		
+		//Determinar si aun hay jugadas posibles
+		if(!comprobarTablero(turnoJugador))
+		    {
+			verTablero();
+			if(turnoJugador == -1)
+			    {
+				System.out.println(jugador1 + " ha ganado");
+			    }
+			else
+			    {
+				System.out.println(jugador2 + " ha ganado");
+			    }
+			Utilidad.waitInput();
+			return;
+		    }
+	    }
     }
 
+  
     /**Pregunta si se desea cambiar el modo de juego de COM
      */
     public void promptCOM()
     {
-
-	//	do
-	//	{
-		System.out.println("\n Escoje lo que deseas realizar" +
-				   "\n1 Seguir jugando" +
-				   "\n2 Regresar al menú principal");
-		int opcion = Utilidad.getUserInt();
-
-		switch(opcion)
-		    {
-		    case 1:
-			
-			System.out.println("Deseas cambiar la configuración de " + jugador2);
-			
-			if(isDumb())
-			    {
-				System.out.println("Actual: Azar");
-			    }
-			else
-			    {
-				System.out.println("Actual: MiniMax");
-			    }
-			
-			if(Utilidad.getUserBool())
-			    {
-				if(isDumb())
-				    {
-					setMiniMax();
-				    }
-				else if(!isDumb())
-				    {
-					setAzar();
-				    }
-				//excepción si no es un número válido
-			    }
-			case 2:
-			    return;
-		    default:break;
-		    }
-		
-		//  }
-    //	while(opcion != 2);
+	
 
 	
+	System.out.println("Deseas cambiar la configuración de " + jugador2);
+	
+	if(isDumb())
+	    {
+		System.out.println("Actual: Azar");
+	    }
+	else
+	    {
+		System.out.println("Actual: MiniMax");
+	    }
+	
+	if(Utilidad.getUserBool())
+	    {
+		if(isDumb())
+		    {
+			setMiniMax();
+		    }
+		else if(!isDumb())
+		    {
+			setAzar();
+			
+			
+			
+		    }
+	    }
     }
-
-   
-
+	
+	
+	
     /**Mueve la ficha de una casilla a otra.
      *@param jugador - numero del jugador cuyo turno es
      */
